@@ -25,6 +25,8 @@ namespace Framework._Task_1.Tests
             calculatorPage = new CalculatorPage(driver);
             estimateSummaryPage = new EstimateSummaryPage(driver);
             config = new ConfigurationHelper("C:\\Users\\myasn\\source\\repos\\Framework. Task 1\\Framework. Task 1\\Model\\testdata-qa1.properties");
+            //config = new ConfigurationHelper(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"\Model\testdata-qa1.properties"));
+
         }
 
         [TestCleanup]
