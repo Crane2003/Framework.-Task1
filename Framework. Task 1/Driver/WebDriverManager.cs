@@ -2,37 +2,35 @@
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Firefox;
 
-namespace Framework._Task_1.Driver
+namespace Framework._Task_1.Driver;
+
+public class WebDriverManager
 {
-    public class WebDriverManager
+    private IWebDriver _driver;
+
+    public IWebDriver GetDriver(string browser)
     {
-        private IWebDriver driver;
-
-        public IWebDriver GetDriver(string browser)
+        switch (browser.ToLower())
         {
-            switch (browser.ToLower())
-            {
-                case "chrome":
-                    driver = new ChromeDriver();
-                    break;
-                case "firefox":
-                    driver = new FirefoxDriver();
-                    break;
-                default:
-                    driver = new ChromeDriver();
-                    break;
-            }
-
-            driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
-            driver.Manage().Window.Maximize();
-            return driver;
+            case "chrome":
+                _driver = new ChromeDriver();
+                break;
+            case "firefox":
+                _driver = new FirefoxDriver();
+                break;
+            default:
+                _driver = new ChromeDriver();
+                break;
         }
 
-        public void QuitDriver()
-        {
-            driver.Quit();
-            driver = null;
-        }
+        _driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
+        _driver.Manage().Window.Maximize();
+        return _driver;
     }
 
+    public void QuitDriver()
+    {
+        _driver.Quit();
+        _driver = null;
+    }
 }

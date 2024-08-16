@@ -1,49 +1,45 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
 
-namespace Framework._Task_1.Pages
+namespace Framework._Task_1.Pages;
+
+public class EstimateSummaryPage
 {
-    public class EstimateSummaryPage
+    private readonly IWebDriver _driver;
+
+    public EstimateSummaryPage(IWebDriver driver)
     {
-        private readonly IWebDriver driver;
+        _driver = driver;
+    }
 
-        public EstimateSummaryPage(IWebDriver driver)
+    public Dictionary<string, string> GetSummary()
+    {
+        var actualValues = new Dictionary<string, string>
         {
-            this.driver = driver;
-        }
+            ["numberOfInstances"] = GetElement("Number of Instances"),
 
-        public Dictionary<string, string> GetSummary()
-        {
-            // Get the actual values from the page
-            var actualValues = new Dictionary<string, string>();
+            ["operatingSystem"] = GetElement("Operating System / Software"),
 
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(2));
-            // Number of instances
-            actualValues["Number of instances"] = wait.Until(drv => drv.FindElement(By.CssSelector("#yDmH0d > c-wiz.SSPGKf > div > div > div > div > div.qBohdf.AlLELb > div.oijjFb > div:nth-child(1) > div > div:nth-child(2) > div > div:nth-child(7) > span > span.Z7Pe2d.g5Ano > span.Kfvdz"))).Text;
+            ["provisioningModel"] = GetElement("Provisioning Model"),
 
-            // Operating System / Software
-            actualValues["Operating System / Software"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[8]/span/span[1]/span[2]")).Text;
+            ["machineType"] = GetElement("Machine type"),
 
-            // Provisioning model
-            actualValues["Provisioning model"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[9]/span/span[1]/span[2]")).Text;
+            ["gpuType"] = GetElement("GPU Model"),
 
-            // Machine type
-            actualValues["Machine type"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[3]/span[2]/span[1]/span[2]")).Text;
+            ["numberOfGPUs"] = GetElement("Number of GPUs"),
 
-            // GPU type
-            actualValues["GPU type"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[4]/span[2]/span[1]/span[2]")).Text;
+            ["localSSD"] = GetElement("Local SSD"),
 
-            // Number of GPUs
-            actualValues["Number of GPUs"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[4]/span[3]/span[1]/span[2]")).Text;
+            ["region"] = GetElement("Region")
+        };
 
-            // Local SSD
-            actualValues["Local SSD"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[5]/span/span[1]/span[2]")).Text;
+        return actualValues;
+    }
 
-            // Region
-            actualValues["Region"] = driver.FindElement(By.XPath("//*[@id=\"yDmH0d\"]/c-wiz[1]/div/div/div/div/div[2]/div[2]/div[1]/div/div[2]/div/div[15]/span/span[1]/span[2]")).Text;
+    private string GetElement(string label)
+    {
+        var element = _driver.FindElement(By.XPath($"//span[@class='Z7Pe2d g5Ano'][.//span[@class='zv7tnb' and text()='{label}']]//span[@class='Kfvdz']"));
 
-            // Compare actual values with expected values
-            return actualValues;
-        }
+        string extractedText = element.Text;
+        return extractedText;
     }
 }

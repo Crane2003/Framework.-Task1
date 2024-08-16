@@ -1,123 +1,99 @@
-﻿using Framework._Task_1.Config;
+﻿using Framework._Task_1.Model;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace Framework._Task_1.Pages
+namespace Framework._Task_1.Pages;
+
+public class CalculatorPage
 {
-    public class CalculatorPage
+    private readonly IWebDriver _driver;
+    private readonly WebDriverWait _wait;
+
+    public CalculatorPage(IWebDriver driver)
     {
-        private readonly IWebDriver driver;
-        private readonly WebDriverWait wait;
+        _driver = driver;
+        _wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
+    }
 
-        public CalculatorPage(IWebDriver driver)
-        {
-            this.driver = driver;
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(3));
-        }
+    private IWebElement AddToEstimateButton => _driver.FindElement(By.CssSelector(".UywwFc-LgbsSe.UywwFc-LgbsSe-OWXEXe-Bz112c-M1Soyc.UywwFc-LgbsSe-OWXEXe-dgl2Hf.xhASFc"));
+    private IWebElement ComputeEngineLink;
+    private IWebElement InstancesField;
+    private IWebElement ProvisioningModel;
+    private IWebElement AddGPUsButton;
+    private IWebElement EstimateButton;
+    private IWebElement ShareButton;
 
-        private IWebElement AddToEstimateButton => driver.FindElement(By.CssSelector(".UywwFc-LgbsSe.UywwFc-LgbsSe-OWXEXe-Bz112c-M1Soyc.UywwFc-LgbsSe-OWXEXe-dgl2Hf.xhASFc"));
-        private IWebElement ComputeEngineLink;
-        private IWebElement InstancesField;
-        private IWebElement OSDropDown;
-        private IWebElement ProvisioningModel;
-        private IWebElement MachineFamilyDropdown;
-        private IWebElement SeriesDropdown;
-        private IWebElement MachineTypeDropdown;
-        private IWebElement AddGPUsButton;
-        private IWebElement GPUTypeDropdown;
-        private IWebElement NumberOfGPUsDropdown;
-        private IWebElement LocalSSDDropdown;
-        private IWebElement RegionDropdown;
-        private IWebElement EstimateButton;
-        private IWebElement ShareButton;
+    public void Open()
+    {
+        _driver.Navigate().GoToUrl("https://cloud.google.com/products/calculator/");
+    }
 
+    public void AddComputeEngine()
+    {
+        AddToEstimateButton.Click();
+        ComputeEngineLink = _driver.FindElement(By.CssSelector(".aHij0b-aGsRMb"));
+        _wait.Until(drv => ComputeEngineLink.Displayed && ComputeEngineLink.Enabled);
+        ComputeEngineLink.Click();
+    }
 
-        public void Open()
-        {
-            driver.Navigate().GoToUrl("https://cloud.google.com/products/calculator/");
-            /*            _driver.Navigate().GoToUrl(
-                            "https://cloud.google.com/products/calculator/?dl=CiRmOTQxNWRmNy0xMTEyLTQxZjktYjg4My02Y2NlZWVjMjZiYmQQCBokRjBDMDNBRDctQTNBRC00NDgwLUE2REItRjdGMzZEMEIyMjdF"
-                            );*/
-        }
+    public void FillForm(EstimateData estimateData)
+    {
+        Thread.Sleep(1000);
+        InstancesField = _driver.FindElement(By.CssSelector(".qdOxv-fmcmS-wGMbrd"));
+        ((IJavaScriptExecutor)_driver).ExecuteScript($"arguments[0].value='{estimateData.NumberOfInstances}';", InstancesField);
 
-        public void AddComputeEngine()
-        {
-            AddToEstimateButton.Click();
-            ComputeEngineLink = driver.FindElement(By.CssSelector(".aHij0b-aGsRMb"));
-            wait.Until(drv => ComputeEngineLink.Displayed && ComputeEngineLink.Enabled);
-            ComputeEngineLink.Click();
-        }
+        SelectOptionEqualsTextToMacth(estimateData.OperatingSystem);
 
-        public void FillForm(EstimateData estimateData)
-        {
-            //GetFormElements();
-            Thread.Sleep(2000);
-            InstancesField = driver.FindElement(By.CssSelector(".qdOxv-fmcmS-wGMbrd"));
-            ((IJavaScriptExecutor)driver).ExecuteScript($"arguments[0].value='{estimateData.NumberOfInstances}';", InstancesField);
+        ProvisioningModel = _driver.FindElement(By.XPath("//*[@id=\"ow5\"]/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[9]/div/div/div[2]/div/div/div[1]/label"));
+        ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", ProvisioningModel);
 
-            SelectOptionWithTextToMacth(estimateData.OperatingSystem);
+        SelectOptionEqualsTextToMacth(estimateData.MachineFamily);
 
-            ProvisioningModel = driver.FindElement(By.XPath("//*[@id=\"ow5\"]/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[9]/div/div/div[2]/div/div/div[1]/label"));
-            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", ProvisioningModel);
+        SelectOptionEqualsTextToMacth(estimateData.Series);
 
-            SelectOptionWithTextToMacth(estimateData.MachineFamily);
+        SelectOptionContainsTextToMacth(estimateData.MachineType);
 
-            SelectOptionWithTextToMacth(estimateData.Series);
+        AddGPUsButton = _driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[21]/div/div/div[1]/div/div/span/div/button"));
+        AddGPUsButton.Click();
+        Thread.Sleep(1000);
 
-            SelectOptionWithTextToMacth(estimateData.MachineType);
+        SelectOptionEqualsTextToMacth(estimateData.GPUType);
 
-            AddGPUsButton = driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[21]/div/div/div[1]/div/div/span/div/button"));
-            AddGPUsButton.Click();
-            Thread.Sleep(2000);
+        SelectOptionEqualsTextToMacth(estimateData.NumberOfGPUs);
 
-            //GetGPUForm();
-            SelectOptionWithTextToMacth(estimateData.GPUType);
-            //GPUTypeDropdown.Click();
-            //driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[23]/div/div[1]/div/div/div/div[2]/ul/li[2]")).Click();
+        SelectOptionEqualsTextToMacth(estimateData.LocalSSD);
 
-            SelectOptionWithTextToMacth(estimateData.NumberOfGPUs);
+        SelectOptionEqualsTextToMacth(estimateData.Region);
+        Thread.Sleep(2000);
+    }
 
-            SelectOptionWithTextToMacth(estimateData.LocalSSD);
+    public void SubmitAndVerify()
+    {
 
-            SelectOptionWithTextToMacth(estimateData.Region);
-            Thread.Sleep(2000);
-        }       
+        ShareButton = _driver.FindElement(By.CssSelector("[aria-label='Open Share Estimate dialog']"));
+        ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", ShareButton);
 
-        public void SubmitAndVerify()
-        {
+        EstimateButton = _wait.Until(drv => drv.FindElement(By.CssSelector(".tltOzc.MExMre.rP2xkc.jl2ntd")));
+        ((IJavaScriptExecutor)_driver).ExecuteScript("arguments[0].click();", EstimateButton);
+    }
 
-            ShareButton = driver.FindElement(By.CssSelector("[aria-label='Open Share Estimate dialog']"));
-            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", ShareButton);
+    private void SelectOptionEqualsTextToMacth(string textToMatch)
+    {
+        IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
+        js.ExecuteScript($@"
+    var items = document.querySelectorAll('li.MCs1Pd');
+    for (var i = 0; i < items.length; i++) {{
+        if (items[i].innerText === '{textToMatch}') {{
+            items[i].click();
+            break;
+        }}
+    }}");
+    }
 
-            EstimateButton = wait.Until(drv => drv.FindElement(By.CssSelector(".tltOzc.MExMre.rP2xkc.jl2ntd")));
-            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", EstimateButton);
-        }
-
-        public void GetFormElements()
-        {
-           // Thread.Sleep(2000);
-            InstancesField = driver.FindElement(By.CssSelector(".qdOxv-fmcmS-wGMbrd"));
-            OSDropDown = driver.FindElement(By.CssSelector(".VfPpkd-uusGie-fmcmS-haAclf"));
-            ProvisioningModel = driver.FindElement(By.XPath("//*[@id=\"ow5\"]/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[9]/div/div/div[2]/div/div/div[1]/label"));
-            MachineFamilyDropdown = driver.FindElement(By.CssSelector("[jsname='Wsw6tc']"));
-            SeriesDropdown = driver.FindElement(By.CssSelector("[jsname='vGGDlb']"));
-            MachineTypeDropdown = driver.FindElement(By.CssSelector("[jsname='kgDJk']"));
-            AddGPUsButton = driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[21]/div/div/div[1]/div/div/span/div/button"));
-        }
-
-        public void GetGPUForm()
-        {
-            GPUTypeDropdown = wait.Until(drv => drv.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[23]/div/div[1]/div/div/div/div[1]/div")));
-            NumberOfGPUsDropdown = driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[24]/div/div[1]/div/div/div/div[1]/div"));
-            LocalSSDDropdown = driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[27]/div/div[1]/div/div/div/div[1]/div"));
-            RegionDropdown = driver.FindElement(By.XPath("//*[@id=\"ucj-1\"]/div/div/div/div/div/div/div/div[1]/div/div[2]/div[3]/div[29]/div/div[1]/div/div/div/div[1]/div"));
-
-        }
-
-        private void SelectOptionWithTextToMacth(string textToMatch)
-        {
-            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
-            js.ExecuteScript($@"
+    private void SelectOptionContainsTextToMacth(string textToMatch)
+    {
+        IJavaScriptExecutor js = (IJavaScriptExecutor)_driver;
+        js.ExecuteScript($@"
     var items = document.querySelectorAll('li.MCs1Pd');
     for (var i = 0; i < items.length; i++) {{
         if (items[i].innerText.includes('{textToMatch}')) {{
@@ -125,7 +101,5 @@ namespace Framework._Task_1.Pages
             break;
         }}
     }}");
-        }
     }
-
 }
